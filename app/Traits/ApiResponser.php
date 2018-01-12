@@ -2,8 +2,11 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
 
 trait ApiResponser
 {
@@ -46,8 +49,11 @@ trait ApiResponser
 
 		$collection = $this->filterData($collection, $transformer);
 		$collection = $this->sortData($collection, $transformer);
+		$collection = $this->paginateData($collection);
 
 		$collection = $this->transformData($collection, $transformer);
+
+		$collection = $this->cacheResponse($collection);
 
 		return $this->successResponse($collection, $code);
 	}
@@ -117,8 +123,39 @@ trait ApiResponser
 	}
 
 	/**
+	 * Paginate date
+	 * @param Collection $collection
+	 * @return collection
+	 */
+	protected function paginateData(Collection $collection)
+	{
+		$rules = [
+			'per_page' => 'integer|min:2|max:50',
+		];
+
+		Validator::validate(request()->all(), $rules);
+
+		$page = LengthAwarePaginator::resolveCurrentPage();
+
+		if (request()->has('per_page'))
+			$perPage = (int)(request()->per_page);
+		else
+			$perPage = 15;
+
+		$result = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+
+		$paginated = new LengthAwarePaginator($result, $collection->count(), $perPage, $page, [
+			'path' => LengthAwarePaginator::resolveCurrentPath(),
+		]);
+
+		$paginated->appends(request()->all());
+
+		return $paginated;
+	}
+
+	/**
 	 * Respuesta transformada
-	 * @param type $data
+	 * @param array $data
 	 * @param type $transformer
 	 * @return array
 	 */
@@ -127,6 +164,26 @@ trait ApiResponser
 		$transformation = fractal($data, new $transformer);
 
 		return $transformation->toArray();
+	}
+
+	/**
+	 * Cache de la respuesta
+	 * @param array $data
+	 * @return array
+	 */
+	protected function cacheResponse($data)
+	{
+		$url = request()->url();
+
+		$queryParams = request()->query(); 	// Obtenemos los parametros de la query
+		ksort($queryParams);				// Ordenamos los parametros de la query
+		$queryString = http_build_query($queryParams);	//Reconstruimos los parametros de la query
+		$fullUrl = "{$url}?{$queryString}";				//Reconstruimos la url ordenada
+
+ 		// Tiempo en minutos => 30/60 = 30 segundos
+		return Cache::remember($fullUrl, 30/60, function() use ($data) {
+			return $data;
+		});
 	}
 
 }

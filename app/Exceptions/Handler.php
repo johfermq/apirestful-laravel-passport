@@ -105,15 +105,15 @@ class Handler extends ExceptionHandler
             }
         }
 
+        if ($exception instanceof TokenMismatchException)
+        {
+            return back()->withInput(request()->input());
+        }
+
         if (config('app.debug'))
         {
             return parent::render($request, $exception);
         }
-
-        /*if ($exception instanceof TokenMismatchException)
-        {
-            return $this->errorResponse("La petición ejecutada no es válida.", 401);
-        }*/
 
         return $this->errorResponse("Se ha producido un error inesperado, inténtelo de nuevo.", 500);
     }
@@ -127,14 +127,11 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        // Código Original
-        /*if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+        if ($this->isFronted($request))
+        {
+            return redirect()->guest(route('login'));
         }
 
-        return redirect()->guest(route('login'));*/
-
-        // Código Personalizado
         return $this->errorResponse("Usuario no autenticado.", 401);
     }
 
@@ -153,7 +150,19 @@ class Handler extends ExceptionHandler
     {
         $errors = $e->validator->errors()->getMessages();
 
+        if ($this->isFronted($request))
+        {
+            return $request->expectsJson() ? response()->json($errors, 422) : back()
+                ->withInput(request()->input())
+                ->withErrors($errors);
+        }
+
         return $this->errorResponse($errors, 422);
+    }
+
+    protected function isFronted($request)
+    {
+        return $request->acceptsHtml() && collect($request->route()->middleware())->contains('web');
     }
 
 }

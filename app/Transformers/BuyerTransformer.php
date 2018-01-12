@@ -22,6 +22,35 @@ class BuyerTransformer extends TransformerAbstract
             'fechaCreacion' => (string) $buyer->created_at,
             'fechaActualizacion' => (string) $buyer->updated_at,
             'fechaEliminacion' => isset($buyer->delete_at) ? (string) $buyer->delete_at : null,
+            /**
+             * HATEOAS
+             */
+            'links' => [
+                [
+                    'rel' => 'self',
+                    'href' => route('buyers.show', $buyer->id),
+                ],
+                [
+                    'rel' => 'buyer.categories',
+                    'href' => route('buyers.categories.index', $buyer->id),
+                ],
+                [
+                    'rel' => 'buyer.products',
+                    'href' => route('buyers.products.index', $buyer->id),
+                ],
+                [
+                    'rel' => 'buyer.sellers',
+                    'href' => route('buyers.sellers.index', $buyer->id),
+                ],
+                [
+                    'rel' => 'buyer.transactions',
+                    'href' => route('buyers.transactions.index', $buyer->id),
+                ],
+                [
+                    'rel' => 'user',
+                    'href' => route('users.show', $buyer->id),
+                ],
+            ],
         ];
     }
 
@@ -40,6 +69,26 @@ class BuyerTransformer extends TransformerAbstract
             'fechaCreacion' => 'created_at',
             'fechaActualizacion' => 'updated_at',
             'fechaEliminacion' => 'delete_at',
+        ];
+
+        return isset($attributes[$index]) ? $attributes[$index] : null;
+    }
+
+    /**
+     * Attribute transformed
+     * @param type $index
+     * @return string
+     */
+    public static function transformedAttribute($index)
+    {
+        $attributes = [
+            'id' => 'identificador',
+            'name' => 'nombre',
+            'email' => 'correo',
+            'verified' => 'esVerificado',
+            'created_at' => 'fechaCreacion',
+            'updated_at' => 'fechaActualizacion',
+            'delete_at' => 'fechaEliminacion',
         ];
 
         return isset($attributes[$index]) ? $attributes[$index] : null;
