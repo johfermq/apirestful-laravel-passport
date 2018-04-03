@@ -6,6 +6,10 @@ API completamente Restful con Laravel 5 y autenticación Laravel Passport
 
 ## Configuración
 
+Instalar nucleo del framework y paquetes de la aplicación
+
+`composer install`
+
 Modificar el archivo .env de acuerdo a las necesidades
 
 Ejecutar las migraciones
