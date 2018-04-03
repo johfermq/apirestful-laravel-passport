@@ -2,18 +2,19 @@
 
 namespace App\Exceptions;
 
-use Exception;
-use Illuminate\Support\Str;
 use App\Traits\ApiResponser;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Session\TokenMismatchException;
-use Illuminate\Validation\ValidationException;
+use Asm89\Stack\CorsService;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -25,12 +26,22 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        \Illuminate\Auth\AuthenticationException::class,
-        \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
-        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-        \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
+        // \Illuminate\Auth\AuthenticationException::class,
+        // \Illuminate\Auth\Access\AuthorizationException::class,
+        // \Symfony\Component\HttpKernel\Exception\HttpException::class,
+        // \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+        // \Illuminate\Session\TokenMismatchException::class,
+        // \Illuminate\Validation\ValidationException::class,
+    ];
+
+    /**
+     * A list of the inputs that are never flashed for validation exceptions.
+     *
+     * @var array
+     */
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
     ];
 
     /**
@@ -54,6 +65,21 @@ class Handler extends ExceptionHandler
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
+    {
+        /**
+         * Manejar las excepciones en otro metodo para permitir la inclusión de los cors en las respuestas
+         */
+        $response = $this->handleException($request, $exception);
+
+        /**
+         * Necesario para incluir los cors cuando se producen errores en la petición
+         */
+        app(CorsService::class)->addActualRequestHeaders($response, $request);
+
+        return $response;
+    }
+
+    protected function handleException($request, Exception $exception)
     {
         /**
          * Para retornar solo los mensajes de error en la validación y no más detalles si estamos en producción

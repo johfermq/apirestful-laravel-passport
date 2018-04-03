@@ -9,12 +9,27 @@ use App\Http\Controllers\ApiController;
 class TransactionController extends ApiController
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('scope:read-general')->only(['show']);
+        $this->middleware('can:view,transaction')->only(['show']);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
+        $this->allowedAdminAction();
+
         $transactions = Transaction::all();
 
         return $this->showAll($transactions);

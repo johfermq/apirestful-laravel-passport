@@ -9,6 +9,19 @@ use App\Http\Controllers\ApiController;
 class BuyerCategoryController extends ApiController
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('scope:read-general')->only(['index']);
+        $this->middleware('can:view,buyer')->only(['index']);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response

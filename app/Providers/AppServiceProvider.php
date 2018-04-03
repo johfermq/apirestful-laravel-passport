@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Bitacora;
 use App\Product;
 use App\User;
 use Illuminate\Support\Facades\Event;

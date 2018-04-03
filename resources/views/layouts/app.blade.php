@@ -13,6 +13,32 @@
     <!-- Styles -->
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,400,500,600" rel="stylesheet" type="text/css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <style>
+        html, body {
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .links > a {
+            color: #636b6f;
+            padding: 0 25px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .1rem;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .m-b-md {
+            margin-bottom: 30px;
+        }
+
+        ol.css li > a {
+            padding: 0 25px;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: .1rem;
+        }
+    </style>
     @stack('styles')
 </head>
 <body>
@@ -38,7 +64,11 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
-                        &nbsp;
+                        @if (Auth::check())
+                            <li><a href="{{ route('personal-tokens') }}">My tokens</a></li>
+                            <li><a href="{{ route('personal-clients') }}">My clients</a></li>
+                            <li><a href="{{ route('authorized-tokens') }}">My authorized clients</a></li>
+                        @endif
                     </ul>
 
                     <!-- Right Side Of Navbar -->

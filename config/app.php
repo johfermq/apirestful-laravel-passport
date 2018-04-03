@@ -169,6 +169,8 @@ return [
         Laravel\Tinker\TinkerServiceProvider::class,
         Fideloper\Proxy\TrustedProxyServiceProvider::class,
         Spatie\Fractal\FractalServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
+        Barryvdh\Cors\ServiceProvider::class,
 
         /*
          * Application Service Providers...

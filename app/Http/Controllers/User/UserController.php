@@ -17,9 +17,16 @@ class UserController extends ApiController
      */
     public function __construct()
     {
-        parent::__construct();
-
+        /**
+         * Client.credentials: Protege las rutas básicas de la aplicación
+         */
+        $this->middleware('client.credentials')->only(['store', 'resend']);
+        $this->middleware('auth:api')->except(['store', 'resend', 'verify']);
         $this->middleware('transform.input:' . UserTransformer::class)->only(['store', 'update']);
+        $this->middleware('scope:manage-account')->only(['show', 'update']);
+        $this->middleware('can:view,user')->only(['show']);
+        $this->middleware('can:update,user')->only(['update']);
+        $this->middleware('can:delete,user')->only(['destroy']);
     }
 
     /**
@@ -29,6 +36,8 @@ class UserController extends ApiController
      */
     public function index()
     {
+        $this->allowedAdminAction();
+
         $usuarios = User::all();
 
         return $this->showAll($usuarios);
@@ -85,7 +94,7 @@ class UserController extends ApiController
     {
         // $user = User::findOrFail($id);
 
-         $reglas = [
+        $reglas = [
             'email' => 'email|unique:users,email,'. $user->id,
             'password' => 'min:6|confirmed',
             'admin' => 'in:' . User::USER_ADMIN. ',' . User::USER_REGULAR,
@@ -112,6 +121,8 @@ class UserController extends ApiController
 
         if ($request->has('admin'))
         {
+            $this->allowedAdminAction();
+
             if (!$user->userVerified())
             {
                 return $this->errorResponse('Únicamente los usuarios verificados pueden cambiar su valor de administrador.', 409); //409 = Conflicto en la petición

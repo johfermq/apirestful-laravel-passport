@@ -39,8 +39,8 @@ class Product extends Model
     /**
 	 ** Disponibilidad del producto
 	 **/
-    const PRODUCT_AVAILABLE = 1;
-    const PRODUCT_NO_AVAILABLE = 0;
+    const PRODUCT_AVAILABLE = '1';
+    const PRODUCT_NO_AVAILABLE = '0';
 
     public function productStatus()
     {

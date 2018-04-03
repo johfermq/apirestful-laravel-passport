@@ -2,15 +2,16 @@
 
 namespace App;
 
-use Illuminate\Support\Str;
 use App\Transformers\UserTransformer;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable, HasApiTokens, SoftDeletes;
 
     protected $table = 'users';
 
@@ -51,11 +52,11 @@ class User extends Authenticatable
     /**
      ** Usuario verificado y admin
      **/
-    const USER_VERIFIED = 1;
-    const USER_NO_VERIFIED = 0;
+    const USER_VERIFIED = '1';
+    const USER_NO_VERIFIED = '0';
 
-    const USER_ADMIN = true;
-    const USER_REGULAR = false;
+    const USER_ADMIN = '1';
+    const USER_REGULAR = '0';
 
     public function userVerified()
     {

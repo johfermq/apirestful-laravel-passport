@@ -18,7 +18,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        'Fideloper\Proxy\TrustProxies',
+        \App\Http\Middleware\TrustProxies::class,
     ];
 
     /**
@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            'cors', // Permite cors en las rutas de la api mediante laravel-cors
             'signature:X-Application-Name', // Lo Ejecutamos al principio para agregar la cabecera sin importar la respuesta
             'throttle:60,1',
             'bindings',
@@ -58,9 +59,19 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'client.credentials' => \Laravel\Passport\Http\Middleware\CheckClientCredentials::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \App\Http\Middleware\CustomThrottleRequests::class, // \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'signature' => \App\Http\Middleware\SignatureMiddleware::class,
         'transform.input' => \App\Http\Middleware\TransformInputMiddleware::class,
+        /**
+         * Middlewares for passport scopes
+         */
+        'scope' => \Laravel\Passport\Http\Middleware\CheckForAnyScope::class,
+        'scopes' => \Laravel\Passport\Http\Middleware\CheckScopes::class,
+        /**
+         * Middlewares for laravel-cors
+         */
+        'cors' => \Barryvdh\Cors\HandleCors::class,
     ];
 }
