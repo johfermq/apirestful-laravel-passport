@@ -10,11 +10,11 @@ Modificar el archivo .env de acuerdo a las necesidades
 
 Ejecutar las migraciones
 
-php artisan migrate
+`php artisan migrate`
 
 Instalar Laravel passport
 
-php artisan passport:install
+`php artisan passport:install`
 
 Listo para correr la aplicación
 
