@@ -10,7 +10,9 @@ Instalar nucleo del framework y paquetes de la aplicación
 
 `composer install`
 
-Modificar el archivo .env de acuerdo a las necesidades
+Modificar el archivo .env de acuerdo a las necesidades y generar la llave de la aplicación
+
+`php artisan key:generate`
 
 Ejecutar las migraciones
 
